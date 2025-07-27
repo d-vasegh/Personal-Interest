@@ -74,6 +74,9 @@
     .theme-selector {
       margin-bottom: 20px;
     }
+	.count-box {
+		width: 50px;
+	}
   </style>
 </head>
 <body>
@@ -96,7 +99,7 @@
         <input type="text" id="playerName" placeholder="Player Name" />
       </div>
       <div>
-        <label>Dice Type 1:</label>
+        <label>Dice 1:</label>
         <select id="diceType1">
           <option value="4">d4</option>
           <option value="6">d6</option>
@@ -107,10 +110,10 @@
           <option value="100">d100</option>
         </select>
         <label>Count:</label>
-        <input type="number" min="0" id="diceCount1" value="1">
+        <input type="number" min="0" id="diceCount1" value="1" class="count-box">
       </div>
       <div>
-        <label>Dice Type 2:</label>
+        <label>Dice 2:</label>
         <select id="diceType2">
           <option value="4">d4</option>
           <option value="6">d6</option>
@@ -121,10 +124,10 @@
           <option value="100">d100</option>
         </select>
         <label>Count:</label>
-        <input type="number" min="0" id="diceCount2" value="0">
+        <input type="number" min="0" id="diceCount2" value="0" class="count-box">
       </div>
       <div>
-        <label>Dice Type 3:</label>
+        <label>Dice 3:</label>
         <select id="diceType3">
           <option value="4">d4</option>
           <option value="6" selected>d6</option>
@@ -135,7 +138,7 @@
           <option value="100">d100</option>
         </select>
         <label>Count:</label>
-        <input type="number" min="0" id="diceCount3" value="0">
+        <input type="number" min="0" id="diceCount3" value="0" class="count-box">
       </div>
       <button type="submit">Roll Dice</button>
     </form>
