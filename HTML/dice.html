@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>D&D Dice Roller</title>
+  <style>
+    :root {
+      --bg: #202020;
+      --text: #d0d0d0;
+      --input-bg: #404040;
+      --input-text: #d0d0d0;
+      --btn-hover: #808080;
+      --card-bg: #303030;
+      --border: #505050;
+    }
+
+    body {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      display: flex;
+      padding-top: 5%;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: sans-serif;
+    }
+
+    input, select, button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
+      background-color: var(--input-bg);
+      color: var(--input-text);
+      border: none;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: var(--btn-hover);
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      padding: 12px;
+      margin-bottom: 12px;
+      font-family: monospace;
+      font-size: 16px;
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+    }
+
+    #historyList {
+      font-size: 16px;
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    #historyList li {
+      background: none;
+      border: none;
+      padding: 4px 0;
+      font-family: monospace;
+    }
+
+    .theme-selector {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div style="max-width: 720px;">
+    <h1>D&D Dice Roller</h1>
+	<div class="theme-selector">
+      <label for="theme">Select Theme:</label>
+      <select id="theme">
+        <option value="dark">Classic Dark</option>
+        <option value="classic">Classic</option>
+        <option value="midnight">Midnight Blue</option>
+        <option value="forest">Forest Green</option>
+        <option value="sunset">Sunset Orange</option>
+        <option value="desert">Desert Sand</option>
+        <option value="arcane">Arcane Purple</option>
+      </select>
+    </div>
+    <form id="diceForm">
+      <div>
+        <input type="text" id="playerName" placeholder="Player Name" />
+      </div>
+      <div>
+        <label>Dice Type 1:</label>
+        <select id="diceType1">
+          <option value="4">d4</option>
+          <option value="6">d6</option>
+          <option value="8">d8</option>
+          <option value="10">d10</option>
+          <option value="12">d12</option>
+          <option value="20" selected>d20</option>
+          <option value="100">d100</option>
+        </select>
+        <label>Count:</label>
+        <input type="number" min="0" id="diceCount1" value="1">
+      </div>
+      <div>
+        <label>Dice Type 2:</label>
+        <select id="diceType2">
+          <option value="4">d4</option>
+          <option value="6">d6</option>
+          <option value="8" selected>d8</option>
+          <option value="10">d10</option>
+          <option value="12">d12</option>
+          <option value="20">d20</option>
+          <option value="100">d100</option>
+        </select>
+        <label>Count:</label>
+        <input type="number" min="0" id="diceCount2" value="0">
+      </div>
+      <div>
+        <label>Dice Type 3:</label>
+        <select id="diceType3">
+          <option value="4">d4</option>
+          <option value="6" selected>d6</option>
+          <option value="8">d8</option>
+          <option value="10">d10</option>
+          <option value="12">d12</option>
+          <option value="20">d20</option>
+          <option value="100">d100</option>
+        </select>
+        <label>Count:</label>
+        <input type="number" min="0" id="diceCount3" value="0">
+      </div>
+      <button type="submit">Roll Dice</button>
+    </form>
+
+    <ul id="resultList"></ul>
+
+    <div>
+      <h2>Previous Rolls</h2>
+	  <button id="clearHistoryBtn">Clear History</button>
+      <ul id="historyList"></ul>
+    </div>
+  </div>
+
+  <script>
+    let rollNumber = 1;
+
+    function rollDice(sides, count) {
+      const results = [];
+      for (let i = 0; i < count; i++) {
+        results.push(Math.ceil(Math.random() * sides));
+      }
+      return results;
+    }
+	
+	// Clear history logic
+	document.getElementById('clearHistoryBtn').addEventListener('click', function () {
+		const historyList = document.getElementById('historyList');
+		historyList.innerHTML = '';
+		rollNumber = 1;
+	});
+
+    document.getElementById('diceForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const resultList = document.getElementById('resultList');
+      const historyList = document.getElementById('historyList');
+      resultList.innerHTML = ''; // Clear current roll results
+
+      let historyEntry = `${rollNumber} - `;
+      const groupSummaries = [];
+
+      for (let i = 1; i <= 3; i++) {
+        const type = parseInt(document.getElementById(`diceType${i}`).value);
+        const count = parseInt(document.getElementById(`diceCount${i}`).value);
+
+        if (!isNaN(type) && !isNaN(count) && type > 0 && count > 0) {
+          const rolls = rollDice(type, count);
+          const rollTotal = rolls.reduce((a, b) => a + b, 0);
+          const li = document.createElement('li');
+          li.textContent = `Rolled ${count}d${type}: [ ${rolls.join(', ')} ] → Total: ${rollTotal}`;
+          resultList.appendChild(li);
+
+          groupSummaries.push(`${count}d${type} [${rolls.join(', ')}]`);
+        }
+      }
+
+      if (groupSummaries.length > 0) {
+        const historyItem = document.createElement('li');
+        historyItem.textContent = historyEntry + groupSummaries.join(', ');
+        historyList.prepend(historyItem);
+        rollNumber++;
+      }
+    });
+	
+	document.getElementById('theme').addEventListener('change', function () {
+      const theme = this.value;
+      const root = document.documentElement;
+
+      switch (theme) {
+        case 'dark':
+          root.style.setProperty('--bg', '#202020');
+          root.style.setProperty('--text', '#d0d0d0');
+          root.style.setProperty('--input-bg', '#404040');
+          root.style.setProperty('--input-text', '#d0d0d0');
+          root.style.setProperty('--btn-hover', '#808080');
+          root.style.setProperty('--card-bg', '#303030');
+          root.style.setProperty('--border', '#505050');
+          break;
+        case 'classic':
+          root.style.setProperty('--bg', '#dddddd');
+          root.style.setProperty('--text', '#202020');
+          root.style.setProperty('--input-bg', '#A0A0A0');
+          root.style.setProperty('--input-text', '#404040');
+          root.style.setProperty('--btn-hover', '#808080');
+          root.style.setProperty('--card-bg', '#B0B0B0');
+          root.style.setProperty('--border', '#909090');
+          break;
+        case 'midnight':
+          root.style.setProperty('--bg', '#0b1e3d');
+          root.style.setProperty('--text', '#a6cfff');
+          root.style.setProperty('--input-bg', '#122b50');
+          root.style.setProperty('--input-text', '#a6cfff');
+          root.style.setProperty('--btn-hover', '#255ea8');
+          root.style.setProperty('--card-bg', '#1a2d4f');
+          root.style.setProperty('--border', '#365d8a');
+          break;
+        case 'forest':
+          root.style.setProperty('--bg', '#1f3524');
+          root.style.setProperty('--text', '#cde8c7');
+          root.style.setProperty('--input-bg', '#2a4b34');
+          root.style.setProperty('--input-text', '#cde8c7');
+          root.style.setProperty('--btn-hover', '#4f8c5e');
+          root.style.setProperty('--card-bg', '#2f4531');
+          root.style.setProperty('--border', '#5ca572');
+          break;
+        case 'sunset':
+          root.style.setProperty('--bg', '#3a1a1a');
+          root.style.setProperty('--text', '#ffcfb3');
+          root.style.setProperty('--input-bg', '#5b2c2c');
+          root.style.setProperty('--input-text', '#ffe0c4');
+          root.style.setProperty('--btn-hover', '#b75d3a');
+          root.style.setProperty('--card-bg', '#5a2a1f');
+          root.style.setProperty('--border', '#ff8040');
+          break;
+        case 'desert':
+          root.style.setProperty('--bg', '#f0e2c4');
+          root.style.setProperty('--text', '#4c3b1f');
+          root.style.setProperty('--input-bg', '#d2b48c');
+          root.style.setProperty('--input-text', '#3c2f1d');
+          root.style.setProperty('--btn-hover', '#a37b4c');
+          root.style.setProperty('--card-bg', '#e2c598');
+          root.style.setProperty('--border', '#b69b7d');
+          break;
+        case 'arcane':
+          root.style.setProperty('--bg', '#2b1f40');
+          root.style.setProperty('--text', '#e5d0ff');
+          root.style.setProperty('--input-bg', '#3c2f5a');
+          root.style.setProperty('--input-text', '#e5d0ff');
+          root.style.setProperty('--btn-hover', '#8a65d0');
+          root.style.setProperty('--card-bg', '#3a2e52');
+          root.style.setProperty('--border', '#b28aff');
+          break;
+      }
+    });
+  </script>
+</body>
+</html>
